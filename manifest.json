@@ -1,0 +1,29 @@
+{
+  "name": "info-summary",
+  "label": "Info Summary (Class)",
+  "type": "widget",
+  "version": "1.0.0",
+  "exbVersion": "1.15.0",
+  "author": "octothorpe",
+  "description": "This is the widget used in developer documentation",
+  "copyright": "",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0",
+  "publishMessages": [
+       "DATA_RECORDS_SELECTION_CHANGE"
+  ],
+  "properties": {
+    "hasConfig": true,
+    "canConsumeDataAction": true,
+    "coverLayoutBackground": true,
+    "hasConfigInSettingPage": true,
+    "canGenerateMultipleOutputDataSources": true
+  },
+  "translatedLocales": [
+    "en",
+    "zh-cn"
+  ],
+  "defaultSize": {
+    "width": 800,
+    "height": 500
+  }
+}

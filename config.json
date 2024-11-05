@@ -1,0 +1,19 @@
+{
+  "showSearch": false,
+  "summaryItems": [],
+  "itemAddUpCount": 0,
+  "sideBarActive": false,
+  "activeItemId": "",
+  "useDataSourcesMap": {},
+  "activeItemSetting": {
+    "id": "",
+    "dataSourceId": "",
+    "label": "",
+    "icon": null,
+    "showCount": false,
+    "showList": false,
+    "fields": [],
+    "groupField": [],
+    "featureIconType": 0
+  }
+}
