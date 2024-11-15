@@ -1,32 +1,21 @@
-/**
-  Licensing
+import { type UseDataSource, type ImmutableObject, type IconResult } from 'jimu-core'
 
-  Copyright 2020 Esri
-
-  Licensed under the Apache License, Version 2.0 (the "License"); You
-  may not use this file except in compliance with the License. You may
-  obtain a copy of the License at
-  http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-  implied. See the License for the specific language governing
-  permissions and limitations under the License.
-
-  A copy of the license is available in the repository's
-  LICENSE file.
-*/
-import { type ImmutableObject, UseDataSource } from 'jimu-core'
-import { SummaryItemSettingProps } from './index'
+export interface SummaryItemSettingProps {
+  id: string
+  dataSourceId: string
+  label: string
+  icon: IconResult
+  showCount: boolean
+  showList: boolean
+  fields: string[]
+  groupField: string[]
+  featureIconType: number
+}
 
 export interface Config {
-  showSearch: boolean,
-  itemAddUpCount: number,
-  sideBarActive: boolean,
-  activeItemId: string,
-  useDataSourcesMap: Object,
-  summaryItems: Array<SummaryItemSettingProps>,
+  showSearch: boolean
+  summaryItems: SummaryItemSettingProps[]
+  useDataSourcesMap: { [id: string]: UseDataSource }
   activeItemSetting: SummaryItemSettingProps
 }
 
