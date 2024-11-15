@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "exbVersion": "1.15.0",
   "author": "octothorpe",
-  "description": "This is the widget used in info summary",
+  "description": "This is the widget used in developer documentation",
   "copyright": "",
   "license": "http://www.apache.org/licenses/LICENSE-2.0",
   "publishMessages": [
@@ -16,6 +16,10 @@
     "coverLayoutBackground": true,
     "hasConfigInSettingPage": true
   },
+  "excludeDataActions": [
+    "arcgis-map.addToMap",
+    "directions.PlanRoute"
+  ],
   "translatedLocales": [
     "en",
     "zh-cn"

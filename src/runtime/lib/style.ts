@@ -2,6 +2,9 @@ import { css } from 'jimu-core'
 
 export const style = css` 
 .info-summary {
+    padding: 5px;
+    background-color: aliceblue;
+
     .info-summary__loading {
         position: absolute;
         left: 50%;
@@ -14,6 +17,7 @@ export const style = css`
 
         .header-search {
             flex: 1;
+            margin-right: 15px;
         }
     }
 

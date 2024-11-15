@@ -1,8 +1,8 @@
 {
   "showSearch": false,
-  "summaryItems": [],
+  "dsConfigs": [],
   "useDataSourcesMap": {},
-  "activeItemSetting": {
+  "activeDSConfig": {
     "id": "",
     "dataSourceId": "",
     "label": "",

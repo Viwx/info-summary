@@ -6,6 +6,7 @@ import { CloseOutlined } from 'jimu-icons/outlined/editor/close'
 import { type AllWidgetSettingProps } from 'jimu-for-builder'
 import { DataSourceSelector, AllDataSourceTypes, FieldSelector } from 'jimu-ui/advanced/data-source-selector'
 import { type IMConfig } from '../config'
+import defaultMessages from './translations/default'
 import { IconPicker } from 'jimu-ui/advanced/resource-selector'
 
 interface State {
@@ -26,13 +27,13 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
 
   onItemClick = (item) => {
     const {
-      summaryItems,
+      dsConfigs,
       useDataSourcesMap
     } = this.props.config
     const clickItemId = item?.id
     const { activeItemId } = this.state
 
-    if (!summaryItems) return
+    if (!dsConfigs) return
 
     if (clickItemId !== activeItemId) {
       const {
@@ -53,7 +54,7 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
 
         config: {
           ...this.props.config,
-          activeItemSetting: {
+          activeDSConfig: {
             id,
             dataSourceId: clickDsId,
             label,
@@ -94,14 +95,14 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
     if (useDataSources?.length > 0) {
       dataSourceId = useDataSources[0].dataSourceId
       label = DataSourceManager.getInstance().getDataSource(dataSourceId).getLabel()
-      icon = this.props.config.activeItemSetting.icon
-      showCount = this.props.config.activeItemSetting.showCount
-      showList = this.props.config.activeItemSetting.showList
-      fields = this.props.config.activeItemSetting.fields.asMutable()
-      groupField = this.props.config.activeItemSetting.groupField.asMutable()
-      featureIconType = this.props.config.activeItemSetting.featureIconType
+      icon = this.props.config.activeDSConfig.icon
+      showCount = this.props.config.activeDSConfig.showCount
+      showList = this.props.config.activeDSConfig.showList
+      fields = this.props.config.activeDSConfig.fields.asMutable()
+      groupField = this.props.config.activeDSConfig.groupField.asMutable()
+      featureIconType = this.props.config.activeDSConfig.featureIconType
     }
-    const summaryItems = this.changeItemAtIndex({
+    const dsConfigs = this.changeItemAtIndex({
       dataSourceId,
       label,
       icon,
@@ -128,9 +129,9 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
           ...useDataSourcesMap,
           [dataSourceId]: useDataSources
         },
-        summaryItems,
-        activeItemSetting: {
-          ...this.props.config.activeItemSetting,
+        dsConfigs,
+        activeDSConfig: {
+          ...this.props.config.activeDSConfig,
           dataSourceId,
           label,
           icon,
@@ -145,20 +146,20 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
   }
 
   changeItemAtIndex = (obj, tag = 'change') => {
-    const { summaryItems } = this.props.config
+    const { dsConfigs } = this.props.config
     const { activeItemId } = this.state
 
-    if (!summaryItems) return
+    if (!dsConfigs) return
 
     if (tag === 'change') {
       if (!obj) {
         return
       }
-      if (!summaryItems || summaryItems.length <= 0) {
+      if (!dsConfigs || dsConfigs.length <= 0) {
         return
       }
 
-      return summaryItems
+      return dsConfigs
         .asMutable({ deep: true })
         .map((item, index) => {
           if (item.id === activeItemId) {
@@ -171,29 +172,29 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
           return item
         })
     } else if (tag === 'delete') {
-      const newSummaryItems = [...summaryItems.asMutable({ deep: true })]
-      const deleteItemInd = newSummaryItems
+      const newDSConfigs = [...dsConfigs.asMutable({ deep: true })]
+      const deleteItemInd = newDSConfigs
         .findIndex(item => {
           return item.id === obj.id
         })
 
-      newSummaryItems.splice(deleteItemInd, 1)
+      newDSConfigs.splice(deleteItemInd, 1)
 
-      return newSummaryItems
+      return newDSConfigs
     }
   }
 
   onFieldChange = (allSelectedFields: IMFieldSchema[]) => {
     const fields = allSelectedFields.map(f => f.jimuName)
-    const summaryItems = this.changeItemAtIndex({ fields })
+    const dsConfigs = this.changeItemAtIndex({ fields })
 
     this.props.onSettingChange({
       id: this.props.id,
       config: {
         ...this.props.config,
-        summaryItems,
-        activeItemSetting: {
-          ...this.props.config.activeItemSetting,
+        dsConfigs,
+        activeDSConfig: {
+          ...this.props.config.activeDSConfig,
           fields
         }
       }
@@ -202,15 +203,15 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
 
   onGroupChange = (allSelectedFields: IMFieldSchema[]) => {
     const groupField = allSelectedFields.map(f => f.jimuName)
-    const summaryItems = this.changeItemAtIndex({ groupField })
+    const dsConfigs = this.changeItemAtIndex({ groupField })
 
     this.props.onSettingChange({
       id: this.props.id,
       config: {
         ...this.props.config,
-        summaryItems,
-        activeItemSetting: {
-          ...this.props.config.activeItemSetting,
+        dsConfigs,
+        activeDSConfig: {
+          ...this.props.config.activeDSConfig,
           groupField
         }
       }
@@ -219,15 +220,15 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
 
   onInputChange = (evt: React.FormEvent<HTMLInputElement>) => {
     const label = evt.currentTarget.value
-    const summaryItems = this.changeItemAtIndex({ label })
+    const dsConfigs = this.changeItemAtIndex({ label })
 
     this.props.onSettingChange({
       id: this.props.id,
       config: {
         ...this.props.config,
-        summaryItems,
-        activeItemSetting: {
-          ...this.props.config.activeItemSetting,
+        dsConfigs,
+        activeDSConfig: {
+          ...this.props.config.activeDSConfig,
           label
         }
       }
@@ -235,8 +236,8 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
   }
 
   addSummary = (evt: React.FormEvent<HTMLInputElement>) => {
-    const { summaryItems } = this.props.config
-    const lastItem = summaryItems[summaryItems.length - 1]
+    const { dsConfigs } = this.props.config
+    const lastItem = dsConfigs[dsConfigs.length - 1]
     if (lastItem && !lastItem.dataSourceId) {
       this.setState({ showSidePanel: true, activeItemId: lastItem.id })
       return
@@ -255,18 +256,18 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
       featureIconType: 0
     }
 
-    if (!summaryItems) return
+    if (!dsConfigs) return
 
     this.props.onSettingChange({
       id: this.props.id,
       config: {
         ...this.props.config,
-        summaryItems:
+        dsConfigs:
           [
-            ...summaryItems.asMutable({ deep: true }),
+            ...dsConfigs.asMutable({ deep: true }),
             { ...newItem }
           ],
-        activeItemSetting: { ...newItem }
+        activeDSConfig: { ...newItem }
       }
     })
     this.setState({
@@ -276,15 +277,15 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
   }
 
   getItemUDS = () => {
-    const { useDataSources, config: { summaryItems } } = this.props
+    const { useDataSources, config: { dsConfigs } } = this.props
     const { activeItemId } = this.state
 
     if (useDataSources && useDataSources.length > 0 &&
-      summaryItems && summaryItems.length > 0) {
+      dsConfigs && dsConfigs.length > 0) {
       const dsId = useDataSources[0].dataSourceId
-      const summaryItemsM = summaryItems.asMutable({ deep: true })
+      const dsConfigsM = dsConfigs.asMutable({ deep: true })
 
-      if (summaryItemsM
+      if (dsConfigsM
         .filter((item, index) => {
           if (item.id === activeItemId) {
             return item.dataSourceId === dsId
@@ -307,15 +308,15 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
 
   handleCountSwitch = (evt: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
     const showCount = checked
-    const summaryItems = this.changeItemAtIndex({ showCount })
+    const dsConfigs = this.changeItemAtIndex({ showCount })
 
     this.props.onSettingChange({
       id: this.props.id,
       config: {
         ...this.props.config,
-        summaryItems,
-        activeItemSetting: {
-          ...this.props.config.activeItemSetting,
+        dsConfigs,
+        activeDSConfig: {
+          ...this.props.config.activeDSConfig,
           showCount
         }
       }
@@ -324,15 +325,15 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
 
   handleFeatureListSwitch = (evt: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
     const showList = checked
-    const summaryItems = this.changeItemAtIndex({ showList })
+    const dsConfigs = this.changeItemAtIndex({ showList })
 
     this.props.onSettingChange({
       id: this.props.id,
       config: {
         ...this.props.config,
-        summaryItems,
-        activeItemSetting: {
-          ...this.props.config.activeItemSetting,
+        dsConfigs,
+        activeDSConfig: {
+          ...this.props.config.activeDSConfig,
           showList
         }
       }
@@ -340,15 +341,15 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
   }
 
   onIconChange = (icon: IMIconResult) => {
-    const summaryItems = this.changeItemAtIndex({ icon })
+    const dsConfigs = this.changeItemAtIndex({ icon })
 
     this.props.onSettingChange({
       id: this.props.id,
       config: {
         ...this.props.config,
-        summaryItems,
-        activeItemSetting: {
-          ...this.props.config.activeItemSetting,
+        dsConfigs,
+        activeDSConfig: {
+          ...this.props.config.activeDSConfig,
           icon: icon.asMutable({ deep: true })
         }
       }
@@ -357,15 +358,15 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
 
   onFeatureIconChange = (evt, checked, value) => {
     const featureIconType = value
-    const summaryItems = this.changeItemAtIndex({ featureIconType })
+    const dsConfigs = this.changeItemAtIndex({ featureIconType })
 
     this.props.onSettingChange({
       id: this.props.id,
       config: {
         ...this.props.config,
-        summaryItems,
-        activeItemSetting: {
-          ...this.props.config.activeItemSetting,
+        dsConfigs,
+        activeDSConfig: {
+          ...this.props.config.activeDSConfig,
           featureIconType
         }
       }
@@ -375,7 +376,7 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
   deleteItem = (item) => {
     const { id } = item
     const { activeItemId } = this.state
-    const summaryItems = this.changeItemAtIndex(item, 'delete')
+    const dsConfigs = this.changeItemAtIndex(item, 'delete')
     let propsConfig = null
 
     if (id === activeItemId) {
@@ -383,8 +384,8 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
         id: this.props.id,
         config: {
           ...this.props.config,
-          summaryItems,
-          activeItemSetting: {
+          dsConfigs,
+          activeDSConfig: {
             id: '',
             dataSourceId: '',
             label: undefined,
@@ -404,7 +405,7 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
         id: this.props.id,
         config: {
           ...this.props.config,
-          summaryItems
+          dsConfigs
         }
       }
     }
@@ -442,7 +443,7 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
   }
 
   getDisabledFields = () => {
-    const { dataSourceId, fields } = this.props.config.activeItemSetting
+    const { dataSourceId, fields } = this.props.config.activeDSConfig
     const allFields = DataSourceManager.getInstance().getDataSource(dataSourceId)?.getSelectedFields() || []
 
     return allFields.filter(field => {
@@ -451,9 +452,9 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
   }
 
   getDSListContent = () => {
-    const { summaryItems } = this.props.config
-    return summaryItems && summaryItems.length > 0 &&
-      summaryItems
+    const { dsConfigs } = this.props.config
+    return dsConfigs && dsConfigs.length > 0 &&
+      dsConfigs
         .map(item => {
           return <div style={this.getActiveItemStyle(item)}>
             {
@@ -484,16 +485,16 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
   getSearchContent = () => {
     const {
       showSearch,
-      summaryItems
+      dsConfigs
     } = this.props.config
 
-    return summaryItems &&
-      summaryItems.length > 0 &&
-      summaryItems
+    return dsConfigs &&
+      dsConfigs.length > 0 &&
+      dsConfigs
         .filter(item => {
           return item.fields?.length > 0
         })
-        .length === summaryItems.length &&
+        .length === dsConfigs.length &&
       <div>
         <SettingRow
           flow="no-wrap"
@@ -517,7 +518,8 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
     return <SettingSection
       className="info-summary-section"
       title={this.props.intl.formatMessage({
-        id: 'infoSummaryWidget'
+        id: 'infoSummaryWidget',
+        defaultMessage: defaultMessages.infoSummaryWidget
       })}
     >
       <Button
@@ -543,7 +545,7 @@ export default class Setting extends React.PureComponent<AllWidgetSettingProps<I
 
   getDSSettingPanel = () => {
     const {
-      activeItemSetting: {
+      activeDSConfig: {
         label,
         icon,
         showCount,

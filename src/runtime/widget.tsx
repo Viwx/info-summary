@@ -1,10 +1,9 @@
 /** @jsx jsx */
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import { React, type AllWidgetProps, jsx, DataSourceManager, DataSourceComponent, DataSource, FeatureLayerDataSource, DataRecord, QueriableDataSource, DataRecordSet, MessageManager, DataRecordsSelectionChangeMessage, DataSourceStatus, IMDataSourceInfo, QueryParams } from 'jimu-core'
-import { type IMConfig } from '../config'
+import { type IMConfig, type DSConfig } from '../config'
 import { CollapsablePanel, Icon, TextInput, DataActionList, DataActionListStyle } from 'jimu-ui'
 import { SearchOutlined } from 'jimu-icons/outlined/editor/search'
-import { type SummaryItemSettingProps } from '..'
 import { style } from './lib/style'
 import { createRef } from 'react'
 
@@ -69,7 +68,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   }
 
   loadDataSources = async (value: string) => {
-    const usdIds = this.props.config.summaryItems.map(item => item.dataSourceId)
+    const usdIds = this.props.config.dsConfigs.map(item => item.dataSourceId)
     let queryQueue = []
     let queryResults = []
     let dataBuffer = []
@@ -82,7 +81,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       const id = usdIds[i]
       const dsManager = DataSourceManager.getInstance()
       const ds = dsManager.getDataSource(id) as FeatureLayerDataSource
-      const fields = this.props.config.summaryItems[i].fields.join(',')
+      const fields = this.props.config.dsConfigs[i].fields.join(',')
       const itemQuery = {
         where: value
           ? `concat(${fields}) like '%${value}%' AND ${filterSqlStr}`
@@ -98,7 +97,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
             name: ds.getLabel(),
             dataSource: ds,
             type: 'current',
-            fields: this.props.config.summaryItems[i].fields
+            fields: this.props.config.dsConfigs[i].fields
           })
       }
     }
@@ -213,7 +212,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       : 'summary__label'
   }
 
-  getSummaryItemLabel = (summaryItem: SummaryItemSettingProps) => {
+  getSummaryItemLabel = (summaryItem: DSConfig) => {
     const { id, icon, label, showCount, dataSourceId } = summaryItem
 
     if (!dataSourceId) return ''
@@ -252,7 +251,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     return formatFields
   }
 
-  getFeatureIcon = (summaryItem: SummaryItemSettingProps, symbol?: string) => {
+  getFeatureIcon = (summaryItem: DSConfig, symbol?: string) => {
     const { featureIconType, icon } = summaryItem
 
     if (featureIconType === 0) {
@@ -282,7 +281,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     }
   }
 
-  getSummaryItemContent = (summaryItem: SummaryItemSettingProps) => {
+  getSummaryItemContent = (summaryItem: DSConfig) => {
     const formatData = this.formatDataRecords(summaryItem)
     if (!formatData) return
 
@@ -386,13 +385,13 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   }
 
   getFeaturesContent = () => {
-    const { summaryItems } = this.props.config
+    const { dsConfigs } = this.props.config
 
     return (
       <div>
-        {summaryItems &&
-          summaryItems.length &&
-          summaryItems
+        {dsConfigs &&
+          dsConfigs.length &&
+          dsConfigs
             .filter(item => {
               return !!item.dataSourceId
             })
@@ -401,6 +400,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
                 label={this.getSummaryItemLabel(item.asMutable({ deep: true }))}
                 level={0}
                 type="default"
+                defaultIsOpen
                 onRequestOpen={() => { this.onSummaryOpen(item.id) }}
                 onRequestClose={() => { this.onSummaryClose(item.id) }}
               >
@@ -511,12 +511,12 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
   render () {
     const {
       config: {
-        summaryItems
+        dsConfigs
       }
     } = this.props
     let content = null
 
-    if (summaryItems && summaryItems?.length) {
+    if (dsConfigs && dsConfigs?.length) {
       content = (
         <div className='info-summary'>
           {this.getLoadingContent()}

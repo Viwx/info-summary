@@ -1,6 +1,6 @@
 import { type UseDataSource, type ImmutableObject, type IconResult } from 'jimu-core'
 
-export interface SummaryItemSettingProps {
+export interface DSConfig {
   id: string
   dataSourceId: string
   label: string
@@ -14,9 +14,9 @@ export interface SummaryItemSettingProps {
 
 export interface Config {
   showSearch: boolean
-  summaryItems: SummaryItemSettingProps[]
+  dsConfigs: DSConfig[]
   useDataSourcesMap: { [id: string]: UseDataSource }
-  activeItemSetting: SummaryItemSettingProps
+  activeDSConfig: DSConfig
 }
 
 export type IMConfig = ImmutableObject<Config>
