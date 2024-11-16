@@ -24,7 +24,7 @@ export interface SummaryItemData {
 export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>, State> {
   private readonly searchRef: React.RefObject<HTMLInputElement>
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       dataBuffer: [],
@@ -36,7 +36,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     this.searchRef = createRef()
   }
 
-  shouldComponentUpdate (prevProps: Readonly<AllWidgetProps<IMConfig>>, prevState: Readonly<State>, snapshot?: any): boolean {
+  shouldComponentUpdate(prevProps: Readonly<AllWidgetProps<IMConfig>>, prevState: Readonly<State>, snapshot?: any): boolean {
     const { dataBuffer, activeItems } = prevState
     const { config } = prevProps
     const configFields = Object.keys(config)
@@ -67,6 +67,23 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     return dataBuffer.length > 0 && dataBuffer.find(item => item.dataSourceId === dataSourceId)
   }
 
+  getSQLStr = (fields: string[], value: any): string => {
+    let sqlStr = ''
+    const length = fields.length
+
+    for (let i = 0; i < length; i++) {
+      const field = fields[i]
+
+      if (i === 0) {
+        sqlStr = `${field} like '%${value}%'`
+      } else {
+        sqlStr += ` or ${field} like '%${value}%'`
+      }
+    }
+
+    return sqlStr
+  }
+
   loadDataSources = async (value: string) => {
     const usdIds = this.props.config.dsConfigs.map(item => item.dataSourceId)
     let queryQueue = []
@@ -81,10 +98,10 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       const id = usdIds[i]
       const dsManager = DataSourceManager.getInstance()
       const ds = dsManager.getDataSource(id) as FeatureLayerDataSource
-      const fields = this.props.config.dsConfigs[i].fields.join(',')
+      const fields = this.props.config.dsConfigs[i].fields
       const itemQuery = {
         where: value
-          ? `concat(${fields}) like '%${value}%' AND ${filterSqlStr}`
+          ? `(${this.getSQLStr(fields.asMutable({ deep: true }), value)}) AND ${filterSqlStr}`
           : '1=1',
         outFields: ['*'],
         pageSize: 100
@@ -508,7 +525,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     return dataSourceContent
   }
 
-  render () {
+  render() {
     const {
       config: {
         dsConfigs
