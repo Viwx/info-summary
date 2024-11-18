@@ -31,7 +31,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
       isDataLoaded: false,
       dataSets: [],
       filterSqlStr: '',
-      activeItems: []
+      activeItems: props.config.dsConfigs.map(config => config.id) || []
     }
     this.searchRef = createRef()
   }
